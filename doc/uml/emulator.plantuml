@@ -1,0 +1,5 @@
+class emulator {
+  +start()
+  +stop()
+  +loadProgram(program: String)
+}
