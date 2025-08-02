@@ -1,5 +1,19 @@
-class emulator {
+class Emulator {
   +start()
   +stop()
   +loadProgram(program: String)
 }
+
+class MemoryAdapter {
+  +read(address: Int): Byte
+  +write(address: Int, value: Byte)
+}
+
+class RAM {}
+class ROM {}
+class FileReader {}
+
+class CPU {}
+class Register {}
+
+class Instruction {}
