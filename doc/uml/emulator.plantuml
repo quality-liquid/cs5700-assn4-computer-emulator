@@ -4,16 +4,49 @@ class Emulator {
   +loadProgram(program: String)
 }
 
-class MemoryAdapter {
+class FileReader {}
+
+abstract class MemoryAdapter {
   +read(address: Int): Byte
   +write(address: Int, value: Byte)
 }
 
 class RAM {}
 class ROM {}
-class FileReader {}
 
 class CPU {}
 class Register {}
 
-class Instruction {}
+abstract class InstructionTemplate {}
+class ConcreteInstruction
+
+interface Observable {
+  +addObserver(observer: Observer)
+  +removeObserver(observer: Observer)
+  +notifyObservers()
+}
+
+interface BufferObserver {
+  +update()
+}
+
+class Screen {}
+class ScreenBuffer {}
+
+Observable <|-- ScreenBuffer
+ScreenBuffer *-- BufferObserver
+BufferObserver <|-- Screen
+Emulator *-- Screen
+Observable -l- BufferObserver
+
+Emulator <-- FileReader
+Emulator *-- CPU
+CPU *-- Register
+CPU *-- MemoryAdapter
+CPU *-- InstructionTemplate
+
+InstructionTemplate <|-- ConcreteInstruction
+
+MemoryAdapter <|-- RAM
+MemoryAdapter <|-- ROM
+MemoryAdapter <|-- ScreenBuffer
