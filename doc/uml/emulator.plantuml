@@ -16,7 +16,26 @@ abstract class MemoryAdapter {
 class RAM {}
 class ROM {}
 
-class CPU {}
+class CPU {
+  + registers: CPURegisters
+  + RAM: MemoryAdapter
+  + ROM: MemoryAdapter
+  + screenBuffer: MemoryAdapter
+}
+class CPURegisters {
+  + r0: Register
+  + r1: Register
+  + r2: Register
+  + r3: Register
+  + r4: Register
+  + r5: Register
+  + r6: Register
+  + r7: Register
+  + P: UShort
+  + T: Register
+  + A: UShort
+  + M: Boolean
+}
 class Register {}
 
 abstract class InstructionTemplate {}
@@ -58,7 +77,8 @@ Observable -l- BufferObserver
 
 Emulator <-- FileReader
 Emulator *-- CPU
-CPU *-- Register
+CPURegisters *-- Register
+CPU *-- CPURegisters
 CPU *-- MemoryAdapter
 CPU *-- InstructionTemplate
 
