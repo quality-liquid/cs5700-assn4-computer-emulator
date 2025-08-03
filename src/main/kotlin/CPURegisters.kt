@@ -10,7 +10,7 @@ class CPURegisters {
     val r7 = Register()
 
     // special registers
-    val P: UShort = 0u
+    var P: UShort = 0u
     val T = Register()
     val A: UShort = 0u
     var M: Boolean = false

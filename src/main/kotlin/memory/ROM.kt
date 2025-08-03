@@ -3,12 +3,13 @@ package memory
 
 
 class ROM(private val data: UByteArray): MemoryAdapter {
+    override val size: Int = data.size
 
     override fun read(address: UShort): UByte {
-        TODO("Not yet implemented")
+        return data[address.toInt()]
     }
 
     override fun write(address: UShort) {
-        TODO("Not yet implemented")
+        throw UnsupportedOperationException("You can't write to ROM silly")
     }
 }

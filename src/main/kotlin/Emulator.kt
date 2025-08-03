@@ -1,35 +1,40 @@
 @file:OptIn(ExperimentalUnsignedTypes::class)
 import memory.ROM
 import java.io.File
+import java.io.FileNotFoundException
 
-class Emulator {
-    val ROM = loadProgram()
-    val CPU: CPU = CPU()
+class Emulator(inputProvider: () -> String? = ::readln) {
+    // this is my facade for the system
+    val ROM: ROM = loadProgram(inputProvider)
+    val CPU: CPU = CPU(ROM)
     val SCREEN: Screen = Screen()
 
     fun start() {
-        TODO()
+        CPU.executeProgramInROM()
     }
 
     fun stop() {
         TODO()
+        // interrupt the CPU
     }
 
-    fun loadProgram(): ROM? {
-        for (i in 1..5) {
-            print("Enter the path to the ROM you'd like to load: ")
-            val path = readln()
-            val file = File(path)
+    fun loadProgram(inputProvider: () -> String?): ROM {
+        print("Enter the path to the ROM you'd like to load: ")
+        val path = inputProvider()
+        val file = File(path)
 
-            if (file.exists()) {
-                val bytes: UByteArray = file.readLines().map { it.toUByte(radix = 16) }.toUByteArray()
-                val rom = ROM(bytes)
-                return rom
-            } else {
-                println("File not found: $path")
-            }
+        if (file.exists()) {
+            val bytes: UByteArray = file.readBytes().map { it.toUByte() }.toUByteArray()
+            val rom = ROM(bytes)
+            return rom
+        } else {
+            println("File not found: $path")
+            throw FileNotFoundException()
         }
-        println("you failed to provide a path that works.")
-        return null
     }
+}
+
+fun main() {
+    val emulator: Emulator = Emulator(::readln)
+    emulator.start()
 }

@@ -1,6 +1,6 @@
 package memory
 
-class RAM: MemoryAdapter {
+class RAM(override val size: Int) : MemoryAdapter {
     override fun read(address: UShort): UByte {
         TODO("Not yet implemented")
     }

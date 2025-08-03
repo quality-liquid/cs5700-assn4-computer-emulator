@@ -1,6 +1,6 @@
 package memory
 
-class ScreenBuffer: MemoryAdapter {
+class ScreenBuffer(override val size: Int) : MemoryAdapter {
     override fun read(address: UShort): UByte {
         TODO("Not yet implemented")
     }
