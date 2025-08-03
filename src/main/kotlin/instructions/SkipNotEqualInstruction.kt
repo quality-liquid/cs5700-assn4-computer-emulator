@@ -1,7 +1,7 @@
 package instructions
 
 class SkipNotEqualInstruction: InstructionTemplate {
-    override fun parseNibbles() {
+    override fun parseNibbles(instruction: Int) {
         TODO("Not yet implemented")
     }
 

@@ -1,11 +1,12 @@
 package instructions
 
-class StoreInstruction: InstructionTemplate {
-    override fun parseNibbles() {
+class StoreInstruction(): InstructionTemplate {
+
+    override fun parseNibbles(instruction: Int): Map<String, Int> {
         TODO("Not yet implemented")
     }
 
-    override fun performOperation() {
+    override fun performOperation(nibbles: Map<String, Int>) {
         TODO("Not yet implemented")
     }
 

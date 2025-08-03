@@ -1,7 +1,7 @@
 package instructions
 
 class ReadKeyboardInstruction: InstructionTemplate {
-    override fun parseNibbles() {
+    override fun parseNibbles(instruction: Int) {
         TODO("Not yet implemented")
     }
 

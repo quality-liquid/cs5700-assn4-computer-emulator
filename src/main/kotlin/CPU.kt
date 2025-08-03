@@ -28,6 +28,13 @@ class CPU(val ROM: MemoryAdapter) {
     val SCREEN_BUFFER: MemoryAdapter = ScreenBuffer(4096)
     val executor = Executors.newSingleThreadScheduledExecutor()
 
+    class CPUContext(
+        val registers: CPURegisters,
+        val ram: RAM,
+        val screenBuffer: ScreenBuffer
+    )
+
+
     fun executeProgramInROM() {
         executor.scheduleAtFixedRate( {step()}, 0, 2, TimeUnit.MILLISECONDS)
     }
@@ -48,32 +55,32 @@ class CPU(val ROM: MemoryAdapter) {
         registers.P = (registers.P + 2u).toUShort()
     }
 
-    private fun executeInstruction(instruction: Int) {
+    private fun executeInstruction(rawInstruction: Int) {
         // get the first nibble
-        val opcode: Int = instruction shr 12
+        val opcode: Int = rawInstruction shr 12
         val instruction: InstructionTemplate = instructionFactory(opcode)
-        // todo: execute instruction template method
-        // todo: implement each instruction
+        instruction.execute(rawInstruction, CPUContext(this.registers, this.RAM, this.SCREEN_BUFFER))
     }
 
     private fun instructionFactory(opcode: Int): InstructionTemplate {
         when (opcode) {
-            0x0 -> StoreInstruction()
-            0x1 -> AddInstruction()
-            0x2 -> SubInstruction()
-            0x3 -> ReadInstruction()
-            0x4 -> WriteInstruction()
-            0x5 -> JumpInstruction()
-            0x6 -> ReadKeyboardInstruction()
-            0x7 -> SwitchMemoryInstruction()
-            0x8 -> SkipEqualInstruction()
-            0x9 -> SkipNotEqualInstruction()
-            0xa -> SetAInstruction()
-            0xb -> SetTInstruction()
-            0xc -> ReadTInstruction()
-            0xd -> ConvertToBaseTenInstruction()
-            0xe -> ConvertByteToASCIIInstruction()
-            0xf -> DrawInstruction()
+            0x0 -> return StoreInstruction()
+            0x1 -> return AddInstruction()
+            0x2 -> return SubInstruction()
+            0x3 -> return ReadInstruction()
+            0x4 -> return WriteInstruction()
+            0x5 -> return JumpInstruction()
+            0x6 -> return ReadKeyboardInstruction()
+            0x7 -> return SwitchMemoryInstruction()
+            0x8 -> return SkipEqualInstruction()
+            0x9 -> return SkipNotEqualInstruction()
+            0xa -> return SetAInstruction()
+            0xb -> return SetTInstruction()
+            0xc -> return ReadTInstruction()
+            0xd -> return ConvertToBaseTenInstruction()
+            0xe -> return ConvertByteToASCIIInstruction()
+            0xf -> return DrawInstruction()
+            else -> throw UnsupportedOperationException("Invalid OpCode")
         }
     }
 
