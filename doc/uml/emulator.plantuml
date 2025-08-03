@@ -1,3 +1,5 @@
+@startuml
+
 class Emulator {
   +start()
   +stop()
@@ -80,3 +82,5 @@ InstructionTemplate <|-u- DrawInstruction
 MemoryAdapter <|-- RAM
 MemoryAdapter <|-- ROM
 MemoryAdapter <|-- ScreenBuffer
+
+@enduml
