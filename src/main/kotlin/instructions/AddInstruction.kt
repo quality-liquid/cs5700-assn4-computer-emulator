@@ -11,11 +11,14 @@ class AddInstruction: InstructionTemplate {
     }
 
     override fun performOperation(nibbles: Map<String, Int>, context: CPU.CPUContext) {
-        val src1: UByte = context.registers.
+        val src1: UByte = context.registerMap[nibbles["src1"]]?.value ?: 0u
+        val src2: UByte = context.registerMap[nibbles["src2"]]?.value ?: 0u
+        val result = src1 + src2
+        context.registerMap[nibbles["dest"]]?.value = result.toUByte()
     }
 
     override fun programCounter(context: CPU.CPUContext) {
-        TODO("Not yet implemented")
+        context.registers.P = (context.registers.P + 2u).toUShort()
     }
 
 }
