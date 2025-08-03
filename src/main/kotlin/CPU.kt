@@ -30,8 +30,8 @@ class CPU(val ROM: MemoryAdapter) {
 
     class CPUContext(
         val registers: CPURegisters,
-        val ram: RAM,
-        val screenBuffer: ScreenBuffer
+        val ram: MemoryAdapter,
+        val screenBuffer: MemoryAdapter
     )
 
 
