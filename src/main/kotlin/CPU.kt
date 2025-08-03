@@ -32,7 +32,19 @@ class CPU(val ROM: MemoryAdapter) {
         val registers: CPURegisters,
         val ram: MemoryAdapter,
         val screenBuffer: MemoryAdapter
-    )
+
+        ) {
+        val registerMap = mutableMapOf<Int, Register>(
+            0 to registers.r0,
+            1 to registers.r1,
+            2 to registers.r2,
+            3 to registers.r3,
+            4 to registers.r4,
+            5 to registers.r5,
+            6 to registers.r6,
+            7 to registers.r7
+        )
+    }
 
 
     fun executeProgramInROM() {
