@@ -18,7 +18,22 @@ class CPU {}
 class Register {}
 
 abstract class InstructionTemplate {}
-class ConcreteInstruction
+class StoreInstruction
+class AddInstruction
+class SubInstruction
+class ReadInstruction
+class WriteInstruction
+class JumpInstruction
+class ReadKeyboardInstruction
+class SwitchMemoryInstruction
+class SkipEqualInstruction
+class SkipNotEqualInstruction
+class SetAInstruction
+class SetTInstruction
+class ReadTInstruction
+class ConvertToBaseTenInstruction
+class ConvertByteToASCIIInstruction
+class DrawInstruction
 
 interface Observable {
   +addObserver(observer: Observer)
@@ -45,7 +60,22 @@ CPU *-- Register
 CPU *-- MemoryAdapter
 CPU *-- InstructionTemplate
 
-InstructionTemplate <|-- ConcreteInstruction
+InstructionTemplate <|-- StoreInstruction
+InstructionTemplate <|-- AddInstruction
+InstructionTemplate <|-- SubInstruction
+InstructionTemplate <|-- ReadInstruction
+InstructionTemplate <|-- WriteInstruction
+InstructionTemplate <|-- JumpInstruction
+InstructionTemplate <|-- ReadKeyboardInstruction
+InstructionTemplate <|-- SwitchMemoryInstruction
+InstructionTemplate <|-u- SkipEqualInstruction
+InstructionTemplate <|-u- SkipNotEqualInstruction
+InstructionTemplate <|-u- SetAInstruction
+InstructionTemplate <|-u- SetTInstruction
+InstructionTemplate <|-u- ReadTInstruction
+InstructionTemplate <|-u- ConvertToBaseTenInstruction
+InstructionTemplate <|-u- ConvertByteToASCIIInstruction
+InstructionTemplate <|-u- DrawInstruction
 
 MemoryAdapter <|-- RAM
 MemoryAdapter <|-- ROM
