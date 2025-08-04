@@ -20,19 +20,22 @@ import memory.MemoryAdapter
 import memory.RAM
 import memory.ScreenBuffer
 import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 
 class CPU(val ROM: MemoryAdapter) {
     val registers: CPURegisters = CPURegisters()
     val RAM: MemoryAdapter = RAM(4096)
-    val SCREEN_BUFFER: MemoryAdapter = ScreenBuffer(4096)
+    val SCREEN_BUFFER = ScreenBuffer(4096)
+    val SCREEN = Screen()
     val executor = Executors.newSingleThreadScheduledExecutor()
 
     class CPUContext(
         val registers: CPURegisters,
         val ram: MemoryAdapter,
         val screenBuffer: MemoryAdapter,
-        val rom: MemoryAdapter
+        val rom: MemoryAdapter,
+        val executor: ScheduledExecutorService
         ) {
         val registerMap = mutableMapOf<Int, Register>(
             0 to registers.r0,
@@ -48,6 +51,7 @@ class CPU(val ROM: MemoryAdapter) {
 
 
     fun executeProgramInROM() {
+        SCREEN_BUFFER.subscribe(SCREEN)
         executor.scheduleAtFixedRate( {step()}, 0, 2, TimeUnit.MILLISECONDS)
     }
 
@@ -71,7 +75,8 @@ class CPU(val ROM: MemoryAdapter) {
         // get the first nibble
         val opcode: Int = rawInstruction shr 12
         val instruction: InstructionTemplate = instructionFactory(opcode)
-        instruction.execute(rawInstruction, CPUContext(this.registers, this.RAM, this.SCREEN_BUFFER, this.ROM))
+        instruction.execute(rawInstruction, CPUContext(this.registers, this.RAM,
+            this.SCREEN_BUFFER, this.ROM, this.executor))
     }
 
     private fun instructionFactory(opcode: Int): InstructionTemplate {

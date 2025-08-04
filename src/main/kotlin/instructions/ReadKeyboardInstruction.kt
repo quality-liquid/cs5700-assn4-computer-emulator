@@ -9,7 +9,6 @@ class ReadKeyboardInstruction: InstructionTemplate {
 
     override fun performOperation(nibbles: Map<String, Int>, context: CPU.CPUContext) {
         println("Enter up to one byte as one or two hex digits (0-f): ")
-        // todo: is this okay? blocking whole executor
         val value: String? = readln()
         val valueAsByte: UByte = value?.toUByte() ?: 0u
         context.registerMap[nibbles["dest"]]?.value = valueAsByte

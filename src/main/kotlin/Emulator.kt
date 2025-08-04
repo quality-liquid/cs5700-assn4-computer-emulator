@@ -7,7 +7,6 @@ class Emulator(inputProvider: () -> String? = ::readln) {
     // this is my facade for the system
     val ROM: ROM = loadProgram(inputProvider)
     val CPU: CPU = CPU(ROM)
-    val SCREEN: Screen = Screen()
 
     fun start() {
         CPU.executeProgramInROM()

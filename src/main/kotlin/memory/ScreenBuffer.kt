@@ -1,8 +1,12 @@
 @file:OptIn(ExperimentalUnsignedTypes::class)
 package memory
 
-class ScreenBuffer(override val size: Int) : MemoryAdapter {
+import Observable
+import ScreenBufferObserver
+
+class ScreenBuffer(override val size: Int) : MemoryAdapter, Observable {
     private val memory = UByteArray(size)
+    override val observers = mutableListOf<ScreenBufferObserver>()
 
     override fun read(address: UShort): UByte {
         return memory[address.toInt()]
@@ -10,5 +14,20 @@ class ScreenBuffer(override val size: Int) : MemoryAdapter {
 
     override fun write(address: UShort, value: UByte) {
         memory[address.toInt()] = value
+        notifyObservers()
+    }
+
+    override fun notifyObservers() {
+        for (observer in observers) {
+            observer.update(memory)
+        }
+    }
+
+    override fun subscribe(observer: ScreenBufferObserver) {
+        observers += observer
+    }
+
+    override fun unsubscribe(observer: ScreenBufferObserver) {
+        observers -= observer
     }
 }
