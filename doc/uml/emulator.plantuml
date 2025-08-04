@@ -1,106 +1,161 @@
 @startuml
 
 class Emulator {
+  +ROM: ROM
+  +CPU: CPU
   +start()
   +stop()
-  +loadProgram(program: String)
+  +loadProgram(inputProvider: () -> String?): ROM
 }
 
-class FileReader {}
+package memory {
+  interface MemoryAdapter {
+    +size: Int
+    +read(address: UShort): UByte
+    +write(address: UShort, value: UByte)
+  }
 
-abstract class MemoryAdapter {
-  +read(address: Int): Byte
-  +write(address: Int, value: Byte)
+  class RAM {
+    -memory: UByteArray
+  }
+
+  class ROM {
+    -data: UByteArray
+  }
+
+  class ScreenBuffer {
+    -memory: UByteArray
+    +observers: MutableList<ScreenBufferObserver>
+    +notifyObservers()
+    +subscribe(observer: ScreenBufferObserver)
+    +unsubscribe(observer: ScreenBufferObserver)
+  }
 }
-
-class RAM {}
-class ROM {}
 
 class CPU {
-  + registers: CPURegisters
-  + RAM: MemoryAdapter
-  + ROM: MemoryAdapter
-  + screenBuffer: MemoryAdapter
+  +registers: CPURegisters
+  +RAM: MemoryAdapter
+  +SCREEN_BUFFER: ScreenBuffer
+  +SCREEN: Screen
+  -isRunning: Boolean
+  -cpuJob: Job?
+  -timerJob: Job?
+  +executeProgramInROM()
+  +stop()
+  +step()
+  -executeInstruction(rawInstruction: Int)
+  -instructionFactory(opcode: Int): InstructionTemplate
 }
-class CPURegisters {
-  + r0: Register
-  + r1: Register
-  + r2: Register
-  + r3: Register
-  + r4: Register
-  + r5: Register
-  + r6: Register
-  + r7: Register
-  + P: UShort
-  + T: Register
-  + A: UShort
-  + M: Boolean
-}
-class Register {}
 
-abstract class InstructionTemplate {}
-class StoreInstruction
-class AddInstruction
-class SubInstruction
-class ReadInstruction
-class WriteInstruction
-class JumpInstruction
-class ReadKeyboardInstruction
-class SwitchMemoryInstruction
-class SkipEqualInstruction
-class SkipNotEqualInstruction
-class SetAInstruction
-class SetTInstruction
-class ReadTInstruction
-class ConvertToBaseTenInstruction
-class ConvertByteToASCIIInstruction
-class DrawInstruction
+class CPUContext {
+  +registers: CPURegisters
+  +ram: MemoryAdapter
+  +screenBuffer: MemoryAdapter
+  +rom: MemoryAdapter
+  +registerMap: MutableMap<Int, Register>
+}
+
+class CPURegisters {
+  +r0: Register
+  +r1: Register
+  +r2: Register
+  +r3: Register
+  +r4: Register
+  +r5: Register
+  +r6: Register
+  +r7: Register
+  +P: UShort
+  +T: Register
+  +A: UShort
+  +M: Boolean
+}
+
+class Register {
+  +value: UByte
+}
+
+package instructions {
+  interface InstructionTemplate {
+    +execute(instruction: Int, context: CPUContext)
+    +parseNibbles(instruction: Int): Map<String, Int>
+    +performOperation(nibbles: Map<String, Int>, context: CPUContext)
+    +programCounter(context: CPUContext)
+  }
+
+  class StoreInstruction
+  class AddInstruction
+  class SubInstruction
+  class ReadInstruction
+  class WriteInstruction
+  class JumpInstruction
+  class ReadKeyboardInstruction
+  class SwitchMemoryInstruction
+  class SkipEqualInstruction
+  class SkipNotEqualInstruction
+  class SetAInstruction
+  class SetTInstruction
+  class ReadTInstruction
+  class ConvertToBaseTenInstruction
+  class ConvertByteToASCIIInstruction
+  class DrawInstruction
+}
 
 interface Observable {
-  +addObserver(observer: Observer)
-  +removeObserver(observer: Observer)
+  +observers: MutableList<ScreenBufferObserver>
   +notifyObservers()
+  +subscribe(observer: ScreenBufferObserver)
+  +unsubscribe(observer: ScreenBufferObserver)
 }
 
-interface BufferObserver {
-  +update()
+interface ScreenBufferObserver {
+  +update(memory: UByteArray)
 }
 
-class Screen {}
-class ScreenBuffer {}
+class Screen {
+  +update(memory: UByteArray)
+}
 
-Observable <|-- ScreenBuffer
-ScreenBuffer *-- BufferObserver
-BufferObserver <|-- Screen
-Emulator *-- Screen
-Observable -l- BufferObserver
-
-Emulator <-- FileReader
+' Relationships
 Emulator *-- CPU
-CPURegisters *-- Register
+Emulator *-- ROM
 CPU *-- CPURegisters
-CPU *-- MemoryAdapter
-CPU *-- InstructionTemplate
+CPU *-- ScreenBuffer
+CPU *-- Screen
+CPU ..> CPUContext : creates
+CPUContext *-- CPURegisters
+CPUContext *-- MemoryAdapter
+CPURegisters *-- Register
 
-InstructionTemplate <|-- StoreInstruction
-InstructionTemplate <|-- AddInstruction
-InstructionTemplate <|-- SubInstruction
-InstructionTemplate <|-- ReadInstruction
-InstructionTemplate <|-- WriteInstruction
-InstructionTemplate <|-- JumpInstruction
-InstructionTemplate <|-- ReadKeyboardInstruction
-InstructionTemplate <|-- SwitchMemoryInstruction
-InstructionTemplate <|-u- SkipEqualInstruction
-InstructionTemplate <|-u- SkipNotEqualInstruction
-InstructionTemplate <|-u- SetAInstruction
-InstructionTemplate <|-u- SetTInstruction
-InstructionTemplate <|-u- ReadTInstruction
-InstructionTemplate <|-u- ConvertToBaseTenInstruction
-InstructionTemplate <|-u- ConvertByteToASCIIInstruction
-InstructionTemplate <|-u- DrawInstruction
+MemoryAdapter <|.. RAM
+MemoryAdapter <|.. ROM
+MemoryAdapter <|.. ScreenBuffer
 
-MemoryAdapter <|-- RAM
-MemoryAdapter <|-- ROM
-MemoryAdapter <|-- ScreenBuffer
+Observable <|.. ScreenBuffer
+ScreenBufferObserver <|.. Screen
+ScreenBuffer --> ScreenBufferObserver : notifies
+
+CPU ..> InstructionTemplate : uses
+InstructionTemplate <|.. StoreInstruction
+InstructionTemplate <|.. AddInstruction
+InstructionTemplate <|.. SubInstruction
+InstructionTemplate <|.. ReadInstruction
+InstructionTemplate <|.. WriteInstruction
+InstructionTemplate <|.. JumpInstruction
+InstructionTemplate <|.. ReadKeyboardInstruction
+InstructionTemplate <|.. SwitchMemoryInstruction
+InstructionTemplate <|.. SkipEqualInstruction
+InstructionTemplate <|.. SkipNotEqualInstruction
+InstructionTemplate <|.. SetAInstruction
+InstructionTemplate <|.. SetTInstruction
+InstructionTemplate <|.. ReadTInstruction
+InstructionTemplate <|.. ConvertToBaseTenInstruction
+InstructionTemplate <|.. ConvertByteToASCIIInstruction
+InstructionTemplate <|.. DrawInstruction
+
+InstructionTemplate ..> CPUContext : uses
+
+note right of CPU : Uses coroutines for\ntimer and execution
+note right of ScreenBuffer : Implements Observer pattern\nfor screen updates
+note right of InstructionTemplate : Strategy pattern for\ninstruction execution
 
 @enduml
