@@ -156,6 +156,6 @@ InstructionTemplate ..> CPUContext : uses
 
 note right of CPU : Uses coroutines for\ntimer and execution
 note right of ScreenBuffer : Implements Observer pattern\nfor screen updates
-note right of InstructionTemplate : Strategy pattern for\ninstruction execution
+note right of InstructionTemplate : Template method pattern for\ninstruction execution
 
 @enduml

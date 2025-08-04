@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm") version "2.1.21"
+    application
 }
 
 group = "org.example"
@@ -17,6 +18,15 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
 }
+
 kotlin {
     jvmToolchain(19)
+}
+
+application {
+    mainClass.set("EmulatorKt")
+}
+
+tasks.named<JavaExec>("run") {
+    standardInput = System.`in`
 }
