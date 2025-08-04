@@ -15,7 +15,7 @@ A custom 8-bit computer emulator implemented in Kotlin with support for a 16-ins
 
 The emulator follows clean architecture principles with separate packages for:
 - `memory/` - RAM, ROM, and ScreenBuffer implementations
-- `instructions/` - All 16 instruction implementations using strategy pattern
+- `instructions/` - All 16 instruction implementations using template method pattern
 - Core classes: `CPU`, `Emulator`, `CPURegisters`, `Register`
 
 See `doc/uml/emulator.plantuml` for the complete class diagram.
