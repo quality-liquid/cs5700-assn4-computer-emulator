@@ -31,7 +31,7 @@ class CPU(val ROM: MemoryAdapter) {
     class CPUContext(
         val registers: CPURegisters,
         val ram: MemoryAdapter,
-        val screenBuffer: MemoryAdapter
+        val screenBuffer: MemoryAdapter,
         val rom: MemoryAdapter
         ) {
         val registerMap = mutableMapOf<Int, Register>(
