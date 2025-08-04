@@ -12,6 +12,6 @@ class CPURegisters {
     // special registers
     var P: UShort = 0u
     val T = Register()
-    val A: UShort = 0u
+    var A: UShort = 0u
     var M: Boolean = false
 }

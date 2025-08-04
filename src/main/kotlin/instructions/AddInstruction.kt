@@ -5,7 +5,7 @@ class AddInstruction: InstructionTemplate {
         val nibbles = mutableMapOf<String, Int>()
 
         nibbles["src1"] = (instruction shr 8) and 0x0f
-        nibbles["src2"] = instruction and 0xf0
+        nibbles["src2"] = (instruction and 0xf0) shr 4
         nibbles["dest"] = instruction and 0x0f
         return nibbles
     }
