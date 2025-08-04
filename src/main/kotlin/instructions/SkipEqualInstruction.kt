@@ -3,8 +3,10 @@ package instructions
 class SkipEqualInstruction: InstructionTemplate {
     override fun parseNibbles(instruction: Int): Map<String, Int> {
         val nibbles = mutableMapOf<String, Int>()
-        nibbles["src1"] = (instruction shr 8) and 0x0f
-        nibbles["src2"] = (instruction and 0xf0) shr 4
+        val uInstruction = instruction.toUInt()
+        
+        nibbles["src1"] = ((uInstruction shr 8) and 0x0fu).toInt()
+        nibbles["src2"] = ((uInstruction and 0xf0u) shr 4).toInt()
         return nibbles
     }
 

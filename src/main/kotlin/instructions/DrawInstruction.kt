@@ -3,20 +3,37 @@ package instructions
 class DrawInstruction: InstructionTemplate {
     override fun parseNibbles(instruction: Int): Map<String, Int> {
         val nibbles = mutableMapOf<String, Int>()
-        nibbles["src"] = (instruction shr 8) and 0x0f
-        nibbles["row"] = (instruction and 0xf0) shr 4
-        nibbles["col"] = instruction and 0x0f
+        val uInstruction = instruction.toUInt()
+        
+        nibbles["src"] = ((uInstruction shr 8) and 0x0fu).toInt()
+        nibbles["row"] = ((uInstruction and 0xf0u) shr 4).toInt()
+        nibbles["col"] = (uInstruction and 0x0fu).toInt()
         return nibbles
     }
 
     override fun performOperation(nibbles: Map<String, Int>, context: CPU.CPUContext) {
-        val value = context.registerMap[nibbles["src"]]!!.value
+        val srcRegIndex = nibbles["src"]!!
+        val value = context.registerMap[srcRegIndex]!!.value
+        
         if (value > 0x7fu) {
             throw IllegalArgumentException("Can't write byte greater than 127 to screen")
         }
-        val row = context.registerMap[nibbles["row"]]!!.value
-        val col = context.registerMap[nibbles["col"]]!!.value
+        
+        // Use literal row/col values from instruction, not register values
+        val row = nibbles["row"]!!.toUByte()
+        val col = nibbles["col"]!!.toUByte()
+        
+        // Bounds check for 8x8 screen
+        if (row >= 8u) {
+            throw IllegalArgumentException("Row value $row out of bounds (must be 0-7)")
+        }
+        if (col >= 8u) {
+            throw IllegalArgumentException("Col value $col out of bounds (must be 0-7)")
+        }
+        
+        // Calculate address (8x8 screen buffer)
         val addr = (8u * row) + col
+        
         context.screenBuffer.write(addr.toUShort(), value)
     }
 

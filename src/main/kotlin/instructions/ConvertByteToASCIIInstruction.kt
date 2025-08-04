@@ -3,8 +3,10 @@ package instructions
 class ConvertByteToASCIIInstruction: InstructionTemplate {
     override fun parseNibbles(instruction: Int): Map<String, Int> {
         val nibbles = mutableMapOf<String, Int>()
-        nibbles["src"] = (instruction shr 8) and 0x0f
-        nibbles["dest"] = (instruction and 0xf0) shr 4
+        val uInstruction = instruction.toUInt()
+        
+        nibbles["src"] = ((uInstruction shr 8) and 0x0fu).toInt()
+        nibbles["dest"] = ((uInstruction and 0xf0u) shr 4).toInt()
         return nibbles
     }
 

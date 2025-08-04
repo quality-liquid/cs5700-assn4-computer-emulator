@@ -19,23 +19,23 @@ import instructions.WriteInstruction
 import memory.MemoryAdapter
 import memory.RAM
 import memory.ScreenBuffer
-import java.util.concurrent.Executors
-import java.util.concurrent.ScheduledExecutorService
-import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.*
 
 class CPU(val ROM: MemoryAdapter) {
     val registers: CPURegisters = CPURegisters()
     val RAM: MemoryAdapter = RAM(4096)
-    val SCREEN_BUFFER = ScreenBuffer(4096)
+    val SCREEN_BUFFER = ScreenBuffer(64)
     val SCREEN = Screen()
-    val executor = Executors.newSingleThreadScheduledExecutor()
+    
+    private var isRunning = false
+    private var cpuJob: Job? = null
+    private var timerJob: Job? = null
 
     class CPUContext(
         val registers: CPURegisters,
         val ram: MemoryAdapter,
         val screenBuffer: MemoryAdapter,
-        val rom: MemoryAdapter,
-        val executor: ScheduledExecutorService
+        val rom: MemoryAdapter
         ) {
         val registerMap = mutableMapOf<Int, Register>(
             0 to registers.r0,
@@ -52,13 +52,42 @@ class CPU(val ROM: MemoryAdapter) {
 
     fun executeProgramInROM() {
         SCREEN_BUFFER.subscribe(SCREEN)
-        executor.scheduleAtFixedRate( {step()}, 0, 2, TimeUnit.MILLISECONDS)
+        isRunning = true
+        
+        // Start timer in separate coroutine
+        timerJob = CoroutineScope(Dispatchers.Default).launch {
+            while (isRunning) {
+                if (registers.T.value > 0u) {
+                    registers.T.value = (registers.T.value - 1u).toUByte()
+                }
+                delay(1000 / 60) // 60Hz timer
+            }
+        }
+        
+        // Start CPU execution in separate coroutine
+        cpuJob = CoroutineScope(Dispatchers.Default).launch {
+            while (isRunning) {
+                step()
+                delay(2) // 500Hz CPU clock
+            }
+        }
+        
+        // Wait for completion
+        runBlocking {
+            cpuJob?.join()
+        }
+    }
+
+    fun stop() {
+        isRunning = false
+        cpuJob?.cancel()
+        timerJob?.cancel()
     }
 
     fun step() {
         if (registers.P + 1u >= ROM.size.toUInt()) {
             println("End of program or out of bounds")
-            executor.shutdown()
+            stop()
             return
         }
 
@@ -67,16 +96,26 @@ class CPU(val ROM: MemoryAdapter) {
         val instruction = (high.toInt() shl 8) or low.toInt()
 
         executeInstruction(instruction)
-
-        registers.P = (registers.P + 2u).toUShort()
     }
 
     private fun executeInstruction(rawInstruction: Int) {
         // get the first nibble
         val opcode: Int = rawInstruction shr 12
+        
+        // Simple heuristic: if we encounter an instruction that would access 
+        // an invalid register (like WriteInstruction with reg 8+), it's likely data
+        if (opcode == 0x4) { // WriteInstruction
+            val srcReg = ((rawInstruction shr 8) and 0x0f)
+            if (srcReg > 7) {
+                println("Detected data section (invalid register $srcReg). Halting execution.")
+                stop()
+                return
+            }
+        }
+        
         val instruction: InstructionTemplate = instructionFactory(opcode)
         instruction.execute(rawInstruction, CPUContext(this.registers, this.RAM,
-            this.SCREEN_BUFFER, this.ROM, this.executor))
+            this.SCREEN_BUFFER, this.ROM))
     }
 
     private fun instructionFactory(opcode: Int): InstructionTemplate {

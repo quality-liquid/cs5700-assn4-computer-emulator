@@ -3,10 +3,11 @@ package instructions
 class AddInstruction: InstructionTemplate {
     override fun parseNibbles(instruction: Int): Map<String, Int> {
         val nibbles = mutableMapOf<String, Int>()
+        val uInstruction = instruction.toUInt()
 
-        nibbles["src1"] = (instruction shr 8) and 0x0f
-        nibbles["src2"] = (instruction and 0xf0) shr 4
-        nibbles["dest"] = instruction and 0x0f
+        nibbles["src1"] = ((uInstruction shr 8) and 0x0fu).toInt()
+        nibbles["src2"] = ((uInstruction and 0xf0u) shr 4).toInt()
+        nibbles["dest"] = (uInstruction and 0x0fu).toInt()
         return nibbles
     }
 

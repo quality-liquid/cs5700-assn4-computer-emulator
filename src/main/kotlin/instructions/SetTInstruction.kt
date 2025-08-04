@@ -3,7 +3,9 @@ package instructions
 class SetTInstruction: InstructionTemplate {
     override fun parseNibbles(instruction: Int): Map<String, Int> {
         val nibbles = mutableMapOf<String, Int>()
-        nibbles["addr"] = (instruction and 0xff0) shr 4
+        val uInstruction = instruction.toUInt()
+        
+        nibbles["addr"] = ((uInstruction and 0xff0u) shr 4).toInt()
         return nibbles
     }
 

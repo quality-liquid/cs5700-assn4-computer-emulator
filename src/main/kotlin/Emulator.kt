@@ -13,8 +13,7 @@ class Emulator(inputProvider: () -> String? = ::readln) {
     }
 
     fun stop() {
-        TODO()
-        // interrupt the CPU
+        CPU.stop()
     }
 
     fun loadProgram(inputProvider: () -> String?): ROM {

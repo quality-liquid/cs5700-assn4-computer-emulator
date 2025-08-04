@@ -4,9 +4,10 @@ class StoreInstruction(): InstructionTemplate {
 
     override fun parseNibbles(instruction: Int): Map<String, Int> {
         val nibbles = mutableMapOf<String, Int>()
+        val uInstruction = instruction.toUInt()
 
-        nibbles["dest"] = (instruction shr 8) and 0x0f
-        nibbles["value"] = instruction and 0xff
+        nibbles["dest"] = ((uInstruction shr 8) and 0x0fu).toInt()
+        nibbles["value"] = (uInstruction and 0xffu).toInt()
         return nibbles
     }
 
