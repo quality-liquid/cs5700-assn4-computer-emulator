@@ -9,7 +9,7 @@ class ROM(private val data: UByteArray): MemoryAdapter {
         return data[address.toInt()]
     }
 
-    override fun write(address: UShort) {
+    override fun write(address: UShort, value: UByte) {
         throw UnsupportedOperationException("You can't write to ROM silly")
     }
 }
