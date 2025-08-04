@@ -32,7 +32,7 @@ class CPU(val ROM: MemoryAdapter) {
         val registers: CPURegisters,
         val ram: MemoryAdapter,
         val screenBuffer: MemoryAdapter
-
+        val rom: MemoryAdapter
         ) {
         val registerMap = mutableMapOf<Int, Register>(
             0 to registers.r0,
@@ -71,7 +71,7 @@ class CPU(val ROM: MemoryAdapter) {
         // get the first nibble
         val opcode: Int = rawInstruction shr 12
         val instruction: InstructionTemplate = instructionFactory(opcode)
-        instruction.execute(rawInstruction, CPUContext(this.registers, this.RAM, this.SCREEN_BUFFER))
+        instruction.execute(rawInstruction, CPUContext(this.registers, this.RAM, this.SCREEN_BUFFER, this.ROM))
     }
 
     private fun instructionFactory(opcode: Int): InstructionTemplate {
